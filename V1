@@ -1,167 +1,59 @@
-repeat wait(0.1) until game.Players and game.Players.LocalPlayer and game.Players.LocalPlayer.Character
 
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/MQPS7/SOMTANK-UI-OpenSrc/refs/heads/main/V1"))()
+if not game:IsLoaded() then game.Loaded:Wait() end
+if not game:IsLoaded() then repeat task.wait() until game:IsLoaded() end
 
-local vim = game:GetService("VirtualInputManager")
-local UIS = game:GetService("UserInputService")
-local GuiService = game:GetService("GuiService")
+if getgenv().RunScript == true then	return end
+getgenv().RunScript = true
 
+local queueScript = string.format([[
+loadstring(game:HttpGet('https://raw.githubusercontent.com/MQPS7/test/refs/heads/main/t1'))()
+]])
 
-TweenService = game:GetService("TweenService")
-RunService = game:GetService("RunService")
-Lighting = game:GetService("Lighting")
-replicatedStorage = game:GetService("ReplicatedStorage")
-UIS = game:GetService("UserInputService")
-player = game.Players.LocalPlayer
-character = player.Character
-humanoid = character:FindFirstChildOfClass("Humanoid")
-HMNRT = character:FindFirstChild("HumanoidRootPart")
-Camera = workspace.CurrentCamera
-screenSize = Camera.ViewportSize
-plrGui = player.PlayerGui
+queue_on_teleport(queueScript)
 
---plrGui.BackpackUI.Slots["1"]
-
-local ScreenGui = Instance.new("ScreenGui", plrGui)
-UiIs_Close = false
-
-local function MakeDraggableButton(button: ImageButton, MoveFrame)
-	local dragging = false;	local dragStart
-	local startPos;	local firstPos
-	button.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-			dragging = true
-			dragStart = input.Position
-			Icon_Position = button.Position
-			startPos = MoveFrame.Position
-			if not firstPos then
-				firstPos = MoveFrame.Position
-			end
-		end
-	end)
-	UIS.InputChanged:Connect(function(input)
-		if dragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
-			local delta = input.Position - dragStart
-			MoveFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-		end
-	end)
-	UIS.InputEnded:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-			dragging = false
-		end
-	end)
-end
-local function MakeImageButton(Parent, Size, Posi, BGtran, Color, Imtran, imageID)
-	local NewFrame = Instance.new("ImageButton", Parent)
-	local UICorner = Instance.new("UICorner", NewFrame)
-	NewFrame.Position = Posi
-	NewFrame.Size = Size
-	NewFrame.BackgroundTransparency = BGtran
-	NewFrame.Image = imageID or ""
-	NewFrame.ImageTransparency = Imtran
-	NewFrame.BackgroundColor3 = Color
-	NewFrame.ImageColor3 = Color
-	NewFrame.ZIndex = 2
-	return NewFrame
-end
-local MoveIcon = MakeImageButton(ScreenGui, UDim2.new(0, 53,0, 51), UDim2.new(0.100, 0,0.447, 0), 1, Color3.new(1, 1, 1), 0, "rbxassetid://81129676934693")
-local FOR_MoveIcon = Instance.new("UIAspectRatioConstraint", MoveIcon)
-MakeDraggableButton(MoveIcon, MoveIcon)
-MoveIcon.Activated:Connect(function()
-	if Icon_Position == MoveIcon.Position then
-		vim:SendKeyEvent(true, Enum.KeyCode.Insert, false, game)
-		UiIs_Close = true
-		task.wait(0.05)
-		vim:SendKeyEvent(false, Enum.KeyCode.Insert, false, game)
+repeat wait(0.1) until game.Players
+local TimeWaitLoadGame = 0
+local player = game.Players.LocalPlayer
+repeat
+	wait(0.1)
+	TimeWaitLoadGame = TimeWaitLoadGame + 0.1
+	if TimeWaitLoadGame > 10 then
+		player:Kick()
+		wait(1)
+		game:GetService("TeleportService"):Teleport(126509999114328)
 	end
+until game.Players and game.Players.LocalPlayer and game.Players.LocalPlayer.Character
+
+local player = game.Players.LocalPlayer
+local character = player.Character
+local humanoid = character:FindFirstChildOfClass("Humanoid")
+local HMNRT = character:FindFirstChild("HumanoidRootPart")
+local Camera = workspace.CurrentCamera
+local plrGui = player.PlayerGui
+
+task.spawn(function()
+	pcall(function()
+		local OutTick = 0
+		local LastPosition = HMNRT.Position
+		local Stuck_Count = 0
+		while wait(1) do
+			OutTick = OutTick + 1
+			print("OutTick "..OutTick)
+			local Dis = (LastPosition - HMNRT.Position).Magnitude
+			if Dis < 5 then
+				Stuck_Count = Stuck_Count + 1
+				print("Stuck "..Stuck_Count)
+			end
+			if OutTick >= 25 or Stuck_Count > 2 then
+				player:Kick()
+				wait(1)
+				game:GetService("TeleportService"):Teleport(126509999114328)
+			end
+			LastPosition = HMNRT.Position
+		end
+	end)
 end)
 
---- EXAMPLE !!!
-
-function gradient(text, startColor, endColor)
-	local result = ""
-	local length = #text
-
-	for i = 1, length do
-		local t = (i - 1) / math.max(length - 1, 1)
-		local r = math.floor((startColor.R + (endColor.R - startColor.R) * t) * 255)
-		local g = math.floor((startColor.G + (endColor.G - startColor.G) * t) * 255)
-		local b = math.floor((startColor.B + (endColor.B - startColor.B) * t) * 255)
-
-		local char = text:sub(i, i)
-		result = result .. "<font color=\"rgb(" .. r ..", " .. g .. ", " .. b .. ")\">" .. char .. "</font>"
-	end
-
-	return result
-end
-
-local Window = WindUI:CreateWindow({
-	Title = "Somtank",
-	Icon = "rbxassetid://80019916158199",
-	IconThemed = true,
-	Author = "v0.0.1",
-	Folder = "Somtank",
-	Size = UDim2.fromOffset(460, 320),
-	Transparent = true,
-	Theme = "Violet",
-	User = {
-		Enabled = true,
-		Callback = function() end,
-		Anonymous = false
-	},
-	SideBarWidth = 200,
-	ScrollBarEnabled = true,
-})
-
-if getgenv().MainButton677 then
-	getgenv().MainButton677:Destroy()
-	getgenv().MainButton677 = ScreenGui
-else
-	getgenv().MainButton677 = ScreenGui
-end
-
-Window:EditOpenButton({
-	Title = "Open Example UI",
-	Icon = "monitor",
-	CornerRadius = UDim.new(0,16),
-	StrokeThickness = 2,
-	Color = ColorSequence.new(Color3.fromHex("FF0F7B"),Color3.fromHex("F89B29")),
-	Enabled = false,
-	Draggable = true,
-})
-
-local Tabs = {}
-
-do
-	Tabs.Player = Window:Section({
-		Title = "กลุ่ม 1",
-		Opened = true,
-	})
-	
-	Tabs.Mode1 = Tabs.Player:Tab({ Title = "ผู้เล่น", Icon = "rbxassetid://2795572800" })
-	Tabs.Mode2 = Tabs.Player:Tab({ Title = "ฟาร์ม", Icon = "rbxassetid://9008236330" })
-	
-end
-
-Window:SelectTab(1)
-
-local function tweenPart(fromPart, toPart, time, easingStyle, offset)
-	local targetCFrame = toPart.CFrame
-	if offset then
-		targetCFrame = (toPart.CFrame * CFrame.new(offset.X, offset.Y, offset.Z))
-	end
-	local tweenInfo = TweenInfo.new(time,Enum.EasingStyle[easingStyle],Enum.EasingDirection.Out)
-	local tween = TweenService:Create(fromPart, tweenInfo, {CFrame = targetCFrame})
-	tween:Play()
-end
-
-local function Click_Function(centerX, centerY)
-	--if UiIs_Close == true then return end
-	vim:SendMouseButtonEvent(centerX, centerY, 0, true, game, 0)
-	wait(0.02)
-	vim:SendMouseButtonEvent(centerX, centerY, 0, false, game, 0)
-	wait(0.02)
-end
 
 local function matchesAllowedKeyword(value, allowedKeywords)
 	value = value:lower()
@@ -173,549 +65,214 @@ local function matchesAllowedKeyword(value, allowedKeywords)
 	return false
 end
 
-local Mutations = workspace:WaitForChild("Mutations")
-
-WalkSpeedSet = 16
-Tabs.Mode1:Slider({
-	Title = "ความเร็วการเดิน",
-	Value = {
-		Min = 0,
-		Max = 200,
-		Default = WalkSpeedSet,
-	},
-	Callback = function(value) 
-		WalkSpeedSet = tonumber(value)
+if tonumber(game.PlaceId) == tonumber(79546208627805) then
+	
+	local TweenService = game:GetService("TweenService")
+	local RunService = game:GetService("RunService")
+	local Lighting = game:GetService("Lighting")
+	local replicatedStorage = game:GetService("ReplicatedStorage")
+	local UIS = game:GetService("UserInputService")
+	local player = game.Players.LocalPlayer
+	local character = player.Character
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	local HMNRT = character:FindFirstChild("HumanoidRootPart")
+	local Camera = workspace.CurrentCamera
+	local plrGui = player.PlayerGui
+	local Inventory = player:WaitForChild("Inventory")
+	local HttpService = game:GetService("HttpService")
+	local StageUI = nil
+	
+	local TeleporterAssets = plrGui:WaitForChild("TeleporterAssets")
+	if plrGui:WaitForChild("Interface"):WaitForChild("EntryScreen") then
+		plrGui:WaitForChild("Interface"):WaitForChild("EntryScreen").Visible = false
 	end
-})
-
-jumpPowerSet = 50
-Tabs.Mode1:Slider({
-	Title = "ความเร็วการเดิน",
-	Value = {
-		Min = 0,
-		Max = 200,
-		Default = jumpPowerSet,
-	},
-	Callback = function(value) 
-		jumpPowerSet = tonumber(value)
-	end
-})
-task.spawn(function()
-	while wait(0.1) do
-		if humanoid and humanoid.Parent then
-			humanoid.WalkSpeed = WalkSpeedSet
-			humanoid.JumpPower = jumpPowerSet
+	if TeleporterAssets:WaitForChild("Frame") then
+		TeleporterAssets:WaitForChild("Frame").Visible = true
+		local Frame = TeleporterAssets:WaitForChild("Frame")
+		if Frame:FindFirstChild("TextLabel1") then
+			local TextLabel1 = Frame:FindFirstChild("TextLabel1")
+			TextLabel1.Text = "Somtank ฟาร์มเพชร"
+			TextLabel1.Visible = true
+			TextLabel1.TextColor3 = Color3.new(0.454902, 0.0117647, 1)
+		end
+		if Frame:FindFirstChild("TextLabel2") then
+			local TextLabel2 = Frame:FindFirstChild("TextLabel2")
+			TextLabel2.Text = "ขอบคุณที่ใช้สคริปครับ"
+			TextLabel2.Visible = true
+			TextLabel2.TextColor3 = Color3.new(0.513725, 0.321569, 1)
+		end
+		if Frame:FindFirstChild("TextLabel3") then
+			local TextLabel3 = Frame:FindFirstChild("TextLabel3")
+			TextLabel3.Text = "สถานนะ : รอห้องว่าง"
+			TextLabel3.Visible = true
+			TextLabel3.TextColor3 = Color3.new(0.658824, 0.592157, 1)
+			StageUI = TextLabel3
 		end
 	end
-end)
+	local VirtualInputManager = game:GetService("VirtualInputManager")
+	local screenSize = workspace.CurrentCamera.ViewportSize
+	local centerX = screenSize.X / 2
+	local centerY = screenSize.Y / 2
 
-Tabs.Mode1:Divider()---เส้นใต้
-
-FlyMode = false
-Tabs.Mode1:Toggle({
-	Title = "บิน",
-	Value = false,
-	Callback = function(state) 
-		FlyMode = state
-		Fly()
+	local function Click_Function()
+		VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, game, 0)
+		wait(0.02)
+		VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 0)
+		wait(0.02)
 	end
-})
-
-FlySpeed = 1
-Tabs.Mode1:Slider({
-	Title = "ความเร็วการบิน",
-	Value = {
-		Min = 0,
-		Max = 10,
-		Default = FlySpeed,
-	},
-	Callback = function(value) 
-		FlySpeed = tonumber(value)
-	end
-})
-
-function Fly()
-	wait()
-	local Human = humanoid
-	local Torso = HMNRT
-	local Force = Instance.new("BodyVelocity")
-	local Spin = Instance.new("BodyGyro")
-	Spin.P = 10000
-	Spin.MaxTorque = Vector3.new(Spin.P,Spin.P,Spin.P)*100
-	Spin.CFrame = Torso.CFrame
-	Force.Velocity = Vector3.new(0,0,0)
-	Force.P = 1000
-	Force.MaxForce = Vector3.new(Force.P,Force.P,Force.P)*100
-	Force.Parent = Torso
-	Spin.Parent = Torso
-	Human.PlatformStand = true
-	Human.AutoRotate = false
-	Human:ChangeState(Enum.HumanoidStateType.Freefall)
-	while FlyMode do
-		wait()
-		local Push = Vector3.new(0, 0, 0)
-		local FV = Camera.CFrame:VectorToWorldSpace(Vector3.new(0, 0, -1))
-		local SV = Camera.CFrame:VectorToWorldSpace(Vector3.new(-1, 0, 0))
-		local CoFrame = Camera.CFrame
-		local CV = CFrame.new(Vector3.new(0,0,0),CoFrame.LookVector*Vector3.new(1,0,1)):VectorToObjectSpace(Human.MoveDirection)
-		Push = Push + ((FV * (60*FlySpeed) * -CV.z) or Push)
-		Push = Push + ((SV * (40*FlySpeed) * -CV.x) or Push)
-		Spin.CFrame = CFrame.new(Vector3.new(0, 0, 0), FV)
-		Force.Velocity = Force.Velocity:Lerp(Push, 0.2)
-		if not Human.PlatformStand then
-			Human.PlatformStand = true
-		end
-		if Human.AutoRotate then
-			Human.AutoRotate = false
-		end
-	end
-	Spin:Destroy()
-	Force:Destroy()
-	Human.PlatformStand = false
-	Human.AutoRotate = true
-end
-
-Tabs.Mode1:Button({
-	Title = "แก๊สไม่มีวันหมด",
-	Desc = "คลิกเพื่อเซ็ท",
-	Callback = function()
-		pcall(function()
-			local odmModule = require(game.ReplicatedStorage.Libraries.ODM)
-			odmModule.curGas = 9999
-			odmModule.maxGas = 9999
-			local oldDoODM = odmModule.DoODM
-			odmModule.DoODM = function(...)
-				odmModule.curGas = odmModule.maxGas
-				return oldDoODM(...)
-			end
-		end)
-		WindUI:Notify({
-			Title = "คุณได้เปิดฟังชั่น",
-			Content = "แก๊สไม่มีวันหมด",
-			Duration = 5,
-		})
-	end,
-})
-
-local Wiggle = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Mutation"):WaitForChild("Wiggle")
-Titan_NotEat = false
-Tabs.Mode1:Toggle({
-	Title = "ไททั่นไม่กิน",
-	Value = false,
-	Callback = function(state) 
-		Titan_NotEat = state
-	end
-})
-task.spawn(function()
-	while wait(1) do
-		if Titan_NotEat then
-			Wiggle:FireServer()
-		end
-	end
-end)
-
-FlyFarmSpeed = 200
-Tabs.Mode2:Slider({
-	Title = "ความเร็วการบิน",
-	Value = {
-		Min = 0,
-		Max = 500,
-		Default = 200,
-	},
-	Callback = function(value)
-		FlyFarmSpeed = value
-	end
-})
-
-MaxLevelNeedKill = 10
-Tabs.Mode2:Slider({
-	Title = "เลเวลไททั่นมากสุดที่ต้องการฟาร์ม",
-	Value = {
-		Min = 0,
-		Max = 100,
-		Default = MaxLevelNeedKill,
-	},
-	Callback = function(value)
-		MaxLevelNeedKill = tonumber(value)
-	end
-})
-
-LowLevelNeedKill = 1
-Tabs.Mode2:Slider({
-	Title = "เลเวลไททั่นน้อยสุดที่ต้องการฟาร์ม",
-	Value = {
-		Min = 0,
-		Max = 100,
-		Default = LowLevelNeedKill,
-	},
-	Callback = function(value) 
-		LowLevelNeedKill = tonumber(value)
-	end
-})
-
-NameNeedKill = { "Normal Titan" }
-Tabs.Mode2:Dropdown({
-	Title = "ไททั่นที่ต้องการฆ่า",
-	Values = { "Abnormal Hairy Titan", "Abnormal Titan", "Hairy Titan"
-		, "Crazy Titan", "Normal Titan", "Armoured Titan"
-		, "Abnormal Crazy Titan", "Abnormal Armoured Titan", "Frozen Titan"
-		, "Abnormal Frozen Titan", "Molten Titan", "Colossal Titan", "Abnormal Colossal Titan"
-	},
-	Value = { "Normal Titan" },
-	Multi = true,
-	AllowNone = true,
-	Callback = function(option) 
-		NameNeedKill = option
-	end
-})
-
-Weapon_UI = plrGui:FindFirstChild("BackpackUI"):FindFirstChild("Slots"):FindFirstChild("1")
-CanKill = false
-FarmTitan = false
-Tabs.Mode2:Toggle({
-	Title = "ฟาร์มไทัทัน",
-	Value = false,
-	Callback = function(state)
-		FarmTitan = state
-		task.spawn(function()
-			while FarmTitan do
-				for i,v in ipairs(Mutations:GetChildren()) do
-					if v:IsA("Model") and v:FindFirstChildOfClass("Humanoid") and v.PrimaryPart and FarmTitan == true then
-						if v:FindFirstChild("Stats") then
-							local Stats_Titan = v:FindFirstChild("Stats")
-							if Stats_Titan:FindFirstChild("level") then
-								if Stats_Titan.level.Value > LowLevelNeedKill and Stats_Titan.level.Value < MaxLevelNeedKill then
-									CanKill = true
+	wait(6)
+	local Teleport = false
+	repeat
+		local GotoEnterPart = false
+		if GotoEnterPart == false then
+			for i=1,3 do
+				if workspace:FindFirstChild("Teleporter"..i) then
+					local Model_Teleport = workspace:FindFirstChild("Teleporter"..i)
+					if Model_Teleport:FindFirstChild("BillboardHolder") then
+						local BillboardHolder = Model_Teleport:FindFirstChild("BillboardHolder")
+						local Players = BillboardHolder:FindFirstChild("BillboardGui"):FindFirstChild("Players")
+						if Players.Text == "0/5" then
+							for _, item in ipairs(Model_Teleport:GetChildren()) do
+								if item.Name == "EnterPart" and GotoEnterPart == false then
+									firetouchinterest(HMNRT, item, 0)
+									GotoEnterPart = true
+									wait(0.1)
 								end
 							end
-							if Stats_Titan:FindFirstChild("body") then
-								if matchesAllowedKeyword(Stats_Titan.body.Value, NameNeedKill) then
-									CanKill = true
-								else
-									CanKill = false
-								end
-							end
-						end
-						if character:FindFirstChild("ClientEquipped") then
-							if not character:FindFirstChild("ClientEquipped"):FindFirstChild("Sword") then
-								for i=1,2 do
-									GuiService.SelectedObject = Weapon_UI
-									task.wait(0.1)
-									vim:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-									vim:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-									wait()
-								end
-							end
-						else
-							GuiService.SelectedObject = Weapon_UI
-							task.wait(0.1)
-							vim:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-							vim:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-						end
-						GuiService.SelectedObject = nil
-						local AttackHitbox = v:FindFirstChild("AttackHitbox")
-						if AttackHitbox and CanKill == true and FarmTitan == true then
-							local Hitbox = AttackHitbox:FindFirstChild("Head"):FindFirstChild("Hitbox")
-							local Enamies_Humanoid = v:FindFirstChildOfClass("Humanoid")
-							local Enamies_HumanoidRootPart = v.PrimaryPart
-							if Enamies_HumanoidRootPart and Hitbox then
-								local Dis = (HMNRT.Position - Enamies_HumanoidRootPart.Position).Magnitude
-								local Time_tween = Dis / FlyFarmSpeed
-								Hitbox.Transparency = .5
-								Hitbox.Size = Vector3.new(50,50,50)
-								tweenPart(HMNRT, Enamies_HumanoidRootPart, Time_tween, "Linear", Vector3.new(5, 0, 0))
-								task.wait(Time_tween)
-								WindUI:Notify({
-									Title = "ทวีนเสร็จแล้ว",
-									Content = "Tween End",
-									Duration = 5,
-								})
-								repeat
-									if Hitbox then
-										local Time_Delay = 0
-										local Attack = false
-										repeat
-											vim:SendMouseButtonEvent(screenSize.X / 2, screenSize.Y / 2, 1, true, game, 0)
-											Time_Delay = Time_Delay + 0.2
-											task.wait(0.2)
-											HMNRT.CFrame = CFrame.lookAt(HMNRT.Position, Hitbox.Position)
-											if Attack == false and Time_Delay > 0.7 and Time_Delay < 0.8 then
-												Click_Function(screenSize.X / 2, screenSize.Y / 2)
-												Attack = true
-												WindUI:Notify({
-													Title = "ฟันดาบ",
-													Content = "Attack",
-													Duration = 1,
-												})
-											end
-											if Time_Delay > 1.5 then
-												HMNRT.CFrame = Hitbox.CFrame * CFrame.new(0,0,15)
-											else
-												Click_Function(screenSize.X / 2, screenSize.Y / 2)
-												HMNRT.CFrame = Hitbox.CFrame * CFrame.new(0,150,300)
-											end
-											vim:SendMouseButtonEvent(screenSize.X / 2, screenSize.Y / 2, 1, false, game, 0)
-										until Time_Delay >= 1.8 or FarmTitan == false
-									end
-								until Enamies_Humanoid.Health <= 0 or v == nil or humanoid.Health <= 0 or FarmTitan == false
-								if Hitbox then
-									Hitbox.Transparency = 1
-								end
-								WindUI:Notify({
-									Title = "ฆ่าเสร็จแล้ว",
-									Content = "Killed",
-									Duration = 5,
-								})
-								if humanoid.Health <= 0 then
-									FarmTitan = false
-								end
-							end
-							task.wait(1)
 						end
 					end
 				end
-				task.wait(1)
 			end
+		end
+		if GotoEnterPart == true then
+			GotoEnterPart = false
+			local LobbyCreate = plrGui:FindFirstChild("Interface"):FindFirstChild("LobbyCreate")
+			local ButtonList = LobbyCreate:FindFirstChild("ButtonList")
+			local CreateButton = LobbyCreate:FindFirstChild("HeaderFrame"):FindFirstChild("CreateButton")
+			local Buttin1 = nil
+			if ButtonList and LobbyCreate then
+				for _, item in ipairs(ButtonList:GetChildren()) do
+					if item.Name ~= "Button1" then
+						item:Destroy()
+					else
+						Buttin1 = item
+					end
+				end
+				if Buttin1 and CreateButton then
+					CreateButton.Position = UDim2.new(0.5, 0, 4.5, 0)
+					if TeleporterAssets:WaitForChild("Frame") then
+						TeleporterAssets:WaitForChild("Frame").Visible = false
+					end
+					for i=1,5 do
+						Click_Function()
+					end
+					Buttin1.Visible = false
+					if StageUI then
+						StageUI.Text = "สถานนะ : สร้างห้องสำเร็จ"
+					end
+					for i=1,5 do
+						Click_Function()
+					end
+					if TeleporterAssets:WaitForChild("Frame") then
+						TeleporterAssets:WaitForChild("Frame").Visible = true
+					end
+					wait(30)
+					game:GetService("TeleportService"):Teleport(79546208627805)
+
+				end
+			end
+		end
+		wait(0.1)
+	until Teleport == true
+else	
+	print("---------Game Funtion")	
+	local DiamondCount = plrGui:WaitForChild("Interface"):WaitForChild("DiamondCount"):FindFirstChild("Count")
+	local Map = workspace:WaitForChild("Map")
+	local InnerTouchZone = Map:WaitForChild("Campground"):WaitForChild("MainFire"):WaitForChild("InnerTouchZone")
+	local RemoteEvents = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents")
+	local RequestStartDraggingItem = RemoteEvents:FindFirstChild("RequestStartDraggingItem")
+	local StopDraggingItem = RemoteEvents:FindFirstChild("StopDraggingItem")
+	local RequestTakeDiamonds = RemoteEvents:FindFirstChild("RequestTakeDiamonds")
+	local FastBring_Delay = 0.17
+	local Bring_HipHeight = 6
+	local StartCountDiamon = tonumber(DiamondCount.Text)
+	local Items = workspace:WaitForChild("Items")
+	--local request = http_request or syn.request or request
+	
+	if workspace:FindFirstChild("Map"):FindFirstChild("Boundaries") then
+		workspace:FindFirstChild("Map"):FindFirstChild("Boundaries"):Destroy()
+	end
+	
+	game.Workspace.Gravity = 0
+	
+	task.spawn(function()
+		while wait(3) do
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "💎 เพชรที่มีตอนนี้",Text = "💎 "..tonumber(DiamondCount.Text),Duration = 3})
+		end
+	end)
+	
+	local function BringItemWithItem2(item2)
+		pcall(function()
+			humanoid.HipHeight = Bring_HipHeight
+			HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,Bring_HipHeight,0)
+			wait(FastBring_Delay)
+			wait(FastBring_Delay)
+			wait(FastBring_Delay)
+			RequestStartDraggingItem:FireServer(item2)
+			wait(FastBring_Delay)
+			wait(FastBring_Delay)
+			wait(FastBring_Delay)
+			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
+			wait(FastBring_Delay)
+			HMNRT.CFrame = CFrame.new(InnerTouchZone.Position) * CFrame.new(0,Bring_HipHeight,0)
+			wait(FastBring_Delay)
+			wait(FastBring_Delay)
+			wait(FastBring_Delay)
+			StopDraggingItem:FireServer(item2)
+			wait(FastBring_Delay)
+			StopDraggingItem:FireServer(item2)
+			wait(FastBring_Delay)
+			humanoid.HipHeight = 0
 		end)
 	end
-})
-task.spawn(function()
-	while wait(1) do
-		if FarmTitan then
-			Wiggle:FireServer()
-		end
-	end
-end)
-
-
-Tabs.Mode2:Divider()---เส้นใต้
-
--- Configuration / Optional
-
-local HttpService = game:GetService("HttpService")
-
-local folderPath = "WindUI"
-makefolder(folderPath)
-
-local function SaveFile(fileName, data)
-	local filePath = folderPath .. "/" .. fileName .. ".json"
-	local jsonData = HttpService:JSONEncode(data)
-	writefile(filePath, jsonData)
-end
-
-local function LoadFile(fileName)
-	local filePath = folderPath .. "/" .. fileName .. ".json"
-	if isfile(filePath) then
-		local jsonData = readfile(filePath)
-		return HttpService:JSONDecode(jsonData)
-	end
-end
-
-local function ListFiles()
-	local files = {}
-	for _, file in ipairs(listfiles(folderPath)) do
-		local fileName = file:match("([^/]+)%.json$")
-		if fileName then
-			table.insert(files, fileName)
-		end
-	end
-	return files
-end
-
-local themeValues = {}
-for name, _ in pairs(WindUI:GetThemes()) do
-	table.insert(themeValues, name)
-end
-
-local filesDropdown
-local files = ListFiles()
-
-local currentThemeName = WindUI:GetCurrentTheme()
-local themes = WindUI:GetThemes()
-
-local ThemeAccent = themes[currentThemeName].Accent
-local ThemeOutline = themes[currentThemeName].Outline
-local ThemeText = themes[currentThemeName].Text
-local ThemePlaceholderText = themes[currentThemeName].Placeholder
-
-function updateTheme()
-	WindUI:AddTheme({
-		Name = currentThemeName,
-		Accent = ThemeAccent,
-		Outline = ThemeOutline,
-		Text = ThemeText,
-		Placeholder = ThemePlaceholderText
-	})
-	WindUI:SetTheme(currentThemeName)
-end
-
-local InviteCode = "ApbHXtAwU2"
-local DiscordAPI = "https://discord.com/api/v10/invites/" .. InviteCode .. "?with_counts=true&with_expiration=true"
-
-local Response = game:GetService("HttpService"):JSONDecode(WindUI.Creator.Request({
-	Url = DiscordAPI,
-	Method = "GET",
-	Headers = {
-		["User-Agent"] = "RobloxBot/1.0",
-		["Accept"] = "application/json"
-	}
-}).Body)
-
-Tabs.Mode2:Keybind({
-	Title = "ปุ่มเปิดปิดหน้าต่าง",
-	Desc = "สามารถเซ้ทได้",
-	Value = "Insert",
-	Callback = function(v)
-		Window:SetToggleKey(Enum.KeyCode[v])
-	end
-})
-
-local function parseJSON(luau_table, indent, level, visited)
-	indent = indent or 2
-	level = level or 0
-	visited = visited or {}
-
-	local currentIndent = string.rep(" ", level * indent)
-	local nextIndent = string.rep(" ", (level + 1) * indent)
-
-	if luau_table == nil then
-		return "null"
-	end
-
-	local dataType = type(luau_table)
-
-	if dataType == "table" then
-		if visited[luau_table] then
-			return "\"[Circular Reference]\""
-		end
-
-		visited[luau_table] = true
-
-		local isArray = true
-		local maxIndex = 0
-
-		for k, _ in pairs(luau_table) do
-			if type(k) == "number" and k > maxIndex then
-				maxIndex = k
-			end
-			if type(k) ~= "number" or k <= 0 or math.floor(k) ~= k then
-				isArray = false
-				break
-			end
-		end
-
-		local count = 0
-		for _ in pairs(luau_table) do
-			count = count + 1
-		end
-		if count ~= maxIndex and isArray then
-			isArray = false
-		end
-
-		if count == 0 then
-			return "{}"
-		end
-
-		if isArray then
-			if count == 0 then
-				return "[]"
-			end
-
-			local result = "[\n"
-
-			for i = 1, maxIndex do
-				result = result .. nextIndent .. parseJSON(luau_table[i], indent, level + 1, visited)
-				if i < maxIndex then
-					result = result .. ","
-				end
-				result = result .. "\n"
-			end
-
-			result = result .. currentIndent .. "]"
-			return result
-		else
-			local result = "{\n"
-			local first = true
-
-			local keys = {}
-			for k in pairs(luau_table) do
-				table.insert(keys, k)
-			end
-			table.sort(keys, function(a, b)
-				if type(a) == type(b) then
-					return tostring(a) < tostring(b)
-				else
-					return type(a) < type(b)
-				end
+	print("---------Chest OpenAll")
+	for _, item2 in ipairs(Items:GetChildren()) do
+		if matchesAllowedKeyword(item2.Name, {"Chest"}) then
+			pcall(function()
+				repeat
+					wait(0.3)
+				until item2.PrimaryPart.ProximityAttachment.ProximityInteraction
+				local Prox = item2.PrimaryPart.ProximityAttachment.ProximityInteraction
+				humanoid.HipHeight = 16
+				HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
+				wait(0.2)
+				fireproximityprompt(Prox)
+				wait(0.2)
+				humanoid.HipHeight = 0
 			end)
-
-			for _, k in ipairs(keys) do
-				local v = luau_table[k]
-				if not first then
-					result = result .. ",\n"
-				else
-					first = false
-				end
-
-				if type(k) == "string" then
-					result = result .. nextIndent .. "\"" .. k .. "\": "
-				else
-					result = result .. nextIndent .. "\"" .. tostring(k) .. "\": "
-				end
-
-				result = result .. parseJSON(v, indent, level + 1, visited)
-			end
-
-			result = result .. "\n" .. currentIndent .. "}"
-			return result
 		end
-	elseif dataType == "string" then
-		local escaped = luau_table:gsub("\\", "\\\\")
-		escaped = escaped:gsub("\"", "\\\"")
-		escaped = escaped:gsub("\n", "\\n")
-		escaped = escaped:gsub("\r", "\\r")
-		escaped = escaped:gsub("\t", "\\t")
-
-		return "\"" .. escaped .. "\""
-	elseif dataType == "number" then
-		return tostring(luau_table)
-	elseif dataType == "boolean" then
-		return luau_table and "true" or "false"
-	elseif dataType == "function" then
-		return "\"function\""
-	else
-		return "\"" .. dataType .. "\""
 	end
+	print("---------Get Diamon")
+	for _, Model in ipairs(Items:GetChildren()) do
+		if Model.Name == "Diamond" then
+			pcall(function()
+				if Model.PrimaryPart then
+					wait(0.1)
+					HMNRT.CFrame = Model.PrimaryPart.CFrame
+					wait(0.1)
+					RequestStartDraggingItem:FireServer(Model)
+					wait(0.1)
+					RequestTakeDiamonds:FireServer(Model)
+					wait(0.1)
+					StopDraggingItem:FireServer(Model)
+				end
+				wait()
+			end)
+		end
+	end
+	print("---------Kick")
+	wait(3)
+	player:Kick()
+	wait(0.5)
+	game:GetService("TeleportService"):Teleport(126509999114328)
 end
-
-local function tableToClipboard(luau_table, indent)
-	indent = indent or 4
-	local jsonString = parseJSON(luau_table, indent)
-	setclipboard(jsonString)
-	return jsonString
-end
-
-
--- 1. Load ConfigManager
-local ConfigManager = Window.ConfigManager
-
-
--- 2. Create Config File                    ↓ Config File name
-local myConfig = ConfigManager:CreateConfig("myConfig")
-
-
--- 3. Register elements
-
---               | ↓ Element name (no spaces)  | ↓ Element          |
-myConfig:Register( "toggleNameExample",          ToggleElement      )
-myConfig:Register( "sliderNameExample",          SliderElement      ) 
-myConfig:Register( "keybindNameExample",         KeybindElement     )
-myConfig:Register( "dropdownNameExample",        DropdownElement    )
-myConfig:Register( "inputNameExample",           InputElement       )
-myConfig:Register( "ColorpickerNameExample",     ColorpickerElement )
-
-
-
-Window:OnClose(function()
-	UiIs_Close = false
-end)
