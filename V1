@@ -95,7 +95,7 @@ local Window = WindUI:CreateWindow({
 	IconThemed = true,
 	Author = "v0.0.1",
 	Folder = "Somtank",
-	Size = UDim2.fromOffset(580, 460),
+	Size = UDim2.fromOffset(460, 320),
 	Transparent = true,
 	Theme = "Violet",
 	User = {
@@ -117,24 +117,6 @@ if getgenv().MainButton677 then
 else
 	getgenv().MainButton677 = ScreenGui
 end
-
---Window:SetBackgroundImage("rbxassetid://13511292247")
---Window:SetBackgroundImageTransparency(0.9)
-
--- TopBar Edit
-
--- Disable Topbar Buttons
---Window:DisableTopbarButtons({
---     "Close", 
---     "Minimize", 
---     "Fullscreen",
---})
-
--- Create Custom Topbar Buttons
---                        ↓ Name             ↓ Icon          ↓ Callback                           ↓ LayoutOrder
---Window:CreateTopbarButton("MyCustomButton1", "bird",         function() print("clicked 1!") end,  990)
---Window:CreateTopbarButton("MyCustomButton2", "droplet-off",  function() print("clicked 2!") end,  989)
---Window:CreateTopbarButton("MyCustomButton3", "battery-plus", function() Window:ToggleFullscreen() end, 988)
 
 
 Window:EditOpenButton({
