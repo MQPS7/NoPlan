@@ -139,8 +139,6 @@ do
 	
 	Tabs.Mode1 = Tabs.Player:Tab({ Title = "หมวด 1", Icon = "rbxassetid://2795572800" })
 	
-	--Tabs.Mode2 = Tabs.Player:Tab({ Title = "ฟาร์ม", Icon = "rbxassetid://9008236330" })
-	
 end
 
 Window:SelectTab(1)
@@ -179,6 +177,72 @@ task.spawn(function()
 				PlayerCharacter = descendant.Parent.Parent.Parent
 			end
 		end
+	end
+end)
+
+local function EspCreate(Model, Color3_Selelet, PlayerName)
+	if not Model:FindFirstChild("SOmtankChestESP") then
+		local NewHi = Instance.new("Highlight", Model)
+		local NewBil = Instance.new("BillboardGui", Model)
+		local NewText = Instance.new("TextLabel", NewBil)
+		NewHi.Name = "SOmtankChestESP"
+		NewBil.Name = "SOmtankChestBil"
+		NewHi.OutlineTransparency = 1
+		NewHi.FillColor = Color3_Selelet
+		NewText.BackgroundTransparency = 1
+		NewText.TextColor3 = Color3_Selelet
+		NewText.Text = PlayerName or Model.Name
+		NewBil.Size = UDim2.new(0, 200,0, 50)
+		NewBil.SizeOffset = Vector2.new(0, 0.5)
+		NewBil.AlwaysOnTop = true
+		NewText.Size = UDim2.new(0, 200,0, 50)
+		NewText.TextYAlignment = Enum.TextYAlignment.Top
+		NewText.TextSize = 26
+		NewText.Font = Enum.Font.Highway
+	end
+end
+
+local function DeleteEsp(Model)
+	if Model:FindFirstChild("SOmtankChestESP") then
+		Model:FindFirstChild("SOmtankChestESP"):Destroy()
+	end
+	if Model:FindFirstChild("SOmtankChestBil") then
+		Model:FindFirstChild("SOmtankChestBil"):Destroy()
+	end
+end
+
+EspPlayer = false
+Tabs.Mode1:Toggle({
+	Title = "มองชื่อผู้เล่น",
+	Value = false,
+	Callback = function(state) 
+		EspPlayer = state
+		if EspPlayer == true then
+			for _, OtherPlayer in ipairs(game:GetService("Players"):GetChildren()) do
+				if OtherPlayer ~= player and OtherPlayer.Character then
+					EspCreate(OtherPlayer.Character, Color3.new(1, 0.137255, 0.137255), OtherPlayer.Name)
+				end
+			end
+		else
+			for _, OtherPlayer in ipairs(game:GetService("Players"):GetChildren()) do
+				if OtherPlayer ~= player and OtherPlayer.Character then
+					DeleteEsp(OtherPlayer.Character)
+				end
+			end
+		end
+	end
+})
+
+task.spawn(function()
+	while true do
+		if EspPlayer == true then
+			for _, OtherPlayer in ipairs(game:GetService("Players"):GetChildren()) do
+				if OtherPlayer ~= player and OtherPlayer.Character then
+					EspCreate(OtherPlayer.Character, Color3.new(1, 0.137255, 0.137255), OtherPlayer.Name)
+				end
+			end
+		end
+		task.wait(1)
 	end
 end)
 
