@@ -2,10 +2,6 @@ repeat wait(0.1) until game.Players and game.Players.LocalPlayer and game.Player
 
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/MQPS7/SOMTANK-UI-OpenSrc/refs/heads/main/V1"))()
 
-local vim = game:GetService("VirtualInputManager")
-local UIS = game:GetService("UserInputService")
-local GuiService = game:GetService("GuiService")
-
 TweenService = game:GetService("TweenService")
 RunService = game:GetService("RunService")
 Lighting = game:GetService("Lighting")
@@ -200,6 +196,12 @@ Tabs.Mode1:Slider({
 	end
 })
 
+RunService.RenderStepped:Connect(function()
+	pcall(function()
+		game.Players.LocalPlayer.Character.ControllerManager.GroundController.MoveSpeedFactor = (WalkSpeedSet / 10)
+	end)
+end)
+
 EnvironmentalAssets = nil
 
 if getgenv().EnvironmentalAssets then
@@ -279,14 +281,6 @@ task.spawn(function()
 			end
 		end)
 	end
-end)
-
-RunService.RenderStepped:Connect(function()
-	pcall(function()
-		if PlayerCharacter and PlayerCharacter.ControllerManager and PlayerCharacter.ControllerManager.GroundController then
-			PlayerCharacter.ControllerManager.GroundController.MoveSpeedFactor = WalkSpeedSet / 10
-		end
-	end)
 end)
 
 -- Configuration / Optional
