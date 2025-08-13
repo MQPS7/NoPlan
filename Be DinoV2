@@ -2,10 +2,6 @@ repeat wait(0.1) until game.Players and game.Players.LocalPlayer and game.Player
 
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/MQPS7/SOMTANK-UI-OpenSrc/refs/heads/main/V1"))()
 
-local vim = game:GetService("VirtualInputManager")
-local UIS = game:GetService("UserInputService")
-local GuiService = game:GetService("GuiService")
-
 TweenService = game:GetService("TweenService")
 RunService = game:GetService("RunService")
 Lighting = game:GetService("Lighting")
@@ -64,6 +60,7 @@ end
 local MoveIcon = MakeImageButton(ScreenGui, UDim2.new(0, 53,0, 51), UDim2.new(0.100, 0,0.447, 0), 1, Color3.new(1, 1, 1), 0, "rbxassetid://81129676934693")
 local FOR_MoveIcon = Instance.new("UIAspectRatioConstraint", MoveIcon)
 MakeDraggableButton(MoveIcon, MoveIcon)
+vim = game:GetService("VirtualInputManager")
 MoveIcon.Activated:Connect(function()
 	if Icon_Position == MoveIcon.Position then
 		vim:SendKeyEvent(true, Enum.KeyCode.Insert, false, game)
@@ -151,13 +148,6 @@ local function tweenPart(fromPart, toPart, time, easingStyle, offset)
 	local tweenInfo = TweenInfo.new(time,Enum.EasingStyle[easingStyle],Enum.EasingDirection.Out)
 	local tween = TweenService:Create(fromPart, tweenInfo, {CFrame = targetCFrame})
 	tween:Play()
-end
-
-local function Click_Function(centerX, centerY)
-	vim:SendMouseButtonEvent(centerX, centerY, 0, true, game, 0)
-	wait(0.02)
-	vim:SendMouseButtonEvent(centerX, centerY, 0, false, game, 0)
-	wait(0.02)
 end
 
 local function matchesAllowedKeyword(value, allowedKeywords)
