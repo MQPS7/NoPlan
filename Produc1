@@ -1,12 +1,14 @@
 
 PlaceId_Map = {
 	HuntyZombie = {1, 86076978383613, 103754275310547},
-	Nihgt_In_The_Forest = {1, 126509999114328, 79546208627805}
+	Nihgt_In_The_Forest = {1, 126509999114328, 79546208627805},
+	War_Tycoon = {1, 4639625707, 6856061811, 17267897726, 18161998932, 116355587227251, 124195929639441},
 }
 
 Icons = {
 	HuntyZombie = "http://www.roblox.com/asset/?id=118769197333827",
-	Nihgt_In_The_Forest = "http://www.roblox.com/asset/?id=125302072601462"
+	Nihgt_In_The_Forest = "http://www.roblox.com/asset/?id=125302072601462",
+	War_Tycoon = "http://www.roblox.com/asset/?id=111336895677484"
 }
 
 Promote_Slide = {
